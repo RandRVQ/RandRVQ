@@ -1,0 +1,9 @@
+# RandRVQ1 (Tables I-III): 5 trained + 4 random quantizers, N_big = 8192, s = 1024,
+# with collapse mitigants.
+$include:
+  - conf/base.yml
+
+DAC.n_random_quantizers: 4
+DAC.size_big_codebook: 8192
+DAC.sampling_size: 1024
+DAC.random_collapse_mitigant: true

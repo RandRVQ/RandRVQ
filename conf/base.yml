@@ -1,0 +1,117 @@
+# Shared configuration of all the experiments of the paper.
+# It is the DAC 44.1 kHz configuration, trained on MUSDB18 only, on a single GPU.
+# The experiment files (baseline.yml, randrvq1.yml, ...) include this file and
+# only set the quantizer parameters.
+
+# Model setup
+DAC.sample_rate: 44100
+DAC.encoder_dim: 64
+DAC.encoder_rates: [2, 4, 8, 8]
+DAC.decoder_dim: 1536
+DAC.decoder_rates: [8, 8, 4, 2]
+
+# Quantization, common to all experiments: 9 stages, trained codebooks of 1024
+# tokens, factorised codes of dimension 8.
+DAC.n_codebooks: 9
+DAC.codebook_size: 1024
+DAC.codebook_dim: 8
+DAC.quantizer_dropout: 1.0
+
+# Random RVQ. These defaults give the original DAC; the experiment files
+# override them.
+DAC.n_random_quantizers: 0
+DAC.size_big_codebook: 8192
+DAC.sampling_size: 1024
+DAC.trained_collapse_mitigant: true
+DAC.random_collapse_mitigant: true
+
+# Discriminator
+Discriminator.sample_rate: 44100
+Discriminator.rates: []
+Discriminator.periods: [2, 3, 5, 7, 11]
+Discriminator.fft_sizes: [2048, 1024, 512]
+Discriminator.bands:
+  - [0.0, 0.1]
+  - [0.1, 0.25]
+  - [0.25, 0.5]
+  - [0.5, 0.75]
+  - [0.75, 1.0]
+
+# Optimization
+AdamW.betas: [0.8, 0.99]
+AdamW.lr: 0.0001
+ExponentialLR.gamma: 0.999996
+
+amp: false
+device: cuda
+num_iters: 250000
+save_iters: [10000, 50000, 100000, 200000]
+valid_freq: 1000
+sample_freq: 10000
+val_idx: [0, 1, 2, 3, 4, 5, 6, 7]
+seed: 0
+lambdas:
+  mel/loss: 15.0
+  adv/feat_loss: 2.0
+  adv/gen_loss: 1.0
+  vq/commitment_loss: 0.25
+  vq/codebook_loss: 1.0
+resume: false
+
+# Single-GPU setting used for all the experiments of the paper
+batch_size: 12
+val_batch_size: 12
+num_workers: 4
+
+# Transforms
+VolumeNorm.db: [const, -16]
+build_transform.preprocess:
+  - Identity
+build_transform.augment_prob: 0.0
+build_transform.augment:
+  - Identity
+build_transform.postprocess:
+  - VolumeNorm
+  - RescaleAudio
+  - ShiftPhase
+
+# Loss setup
+MultiScaleSTFTLoss.window_lengths: [2048, 512]
+MelSpectrogramLoss.n_mels: [5, 10, 20, 40, 80, 160, 320]
+MelSpectrogramLoss.window_lengths: [32, 64, 128, 256, 512, 1024, 2048]
+MelSpectrogramLoss.mel_fmin: [0, 0, 0, 0, 0, 0, 0]
+MelSpectrogramLoss.mel_fmax: [null, null, null, null, null, null, null]
+MelSpectrogramLoss.pow: 1.0
+MelSpectrogramLoss.clamp_eps: 1.0e-5
+MelSpectrogramLoss.mag_weight: 0.0
+
+# Data
+train/AudioDataset.duration: 0.38
+train/AudioDataset.n_examples: 10000000
+
+val/AudioDataset.duration: 5.0
+val/build_transform.augment_prob: 1.0
+val/AudioDataset.n_examples: 250
+
+# Test set: 1000 excerpts of 10 s, extracted once by scripts/save_test_set.py
+test/AudioDataset.duration: 10.0
+test/build_transform.augment_prob: 1.0
+test/AudioDataset.n_examples: 1000
+
+AudioLoader.shuffle: true
+AudioDataset.without_replacement: true
+
+# MUSDB18 mixtures, one audio file per track (see scripts/prepare_musdb.py).
+# Paths are relative to the root of the repository. Edit them if your data
+# lives elsewhere.
+train/build_dataset.folders:
+  music_hq:
+    - data/musdb18/train
+
+val/build_dataset.folders:
+  music_hq:
+    - data/musdb18/test
+
+test/build_dataset.folders:
+  music_hq:
+    - data/musdb18/test

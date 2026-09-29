@@ -1,0 +1,6 @@
+# Baseline (Tables I-III): DAC retrained on MUSDB18.
+# 9 trained quantizers with DAC's collapse mitigants.
+$include:
+  - conf/base.yml
+
+DAC.n_random_quantizers: 0

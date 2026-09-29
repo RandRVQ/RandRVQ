@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# Data, experiments and outputs
+data/
+runs/
+samples/
+*.wav
+*.pth
+*.npz
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

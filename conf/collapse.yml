@@ -1,0 +1,7 @@
+# Collapse (Tables II-III): DAC retrained on MUSDB18 without its collapse
+# mitigants (no factorised codes, no L2 normalisation).
+$include:
+  - conf/base.yml
+
+DAC.n_random_quantizers: 0
+DAC.trained_collapse_mitigant: false
